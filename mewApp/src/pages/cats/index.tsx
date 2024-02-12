@@ -1,5 +1,17 @@
+import useGetCats from "./actions";
+
 const Cats = () => {
-  return <div>this is cats main route</div>;
+  const { data, isLoading } = useGetCats();
+
+  return (
+    <>
+      {isLoading ? (
+        <div>...loading </div>
+      ) : (
+        <div>{data && data.map((cat) => <div>{cat.id}</div>)}</div>
+      )}
+    </>
+  );
 };
 
 export default Cats;
