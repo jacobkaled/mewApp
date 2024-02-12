@@ -1,8 +1,12 @@
-import { Grid } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import useGetCats from "./actions";
+import { Waypoint } from "react-waypoint";
 
 const Cats = () => {
-  const { data, isLoading } = useGetCats();
+  const { data, isLoading, isFetching, fetchNextPage } = useGetCats();
+  const combinedData = data ? data.pages.flat() : [];
+
+  console.log("combinedData==>", data);
 
   return (
     <>
@@ -11,7 +15,7 @@ const Cats = () => {
       ) : (
         <Grid container>
           {data &&
-            data.map((cat) => (
+            combinedData.map((cat) => (
               <Grid container display="flex" flexDirection="column">
                 <Grid>{cat.height}</Grid>
                 <Grid>{cat.width}</Grid>
@@ -28,6 +32,19 @@ const Cats = () => {
                 />
               </Grid>
             ))}
+          <Grid
+            container
+            sx={{
+              width: "100%",
+              height: "100px",
+              marginTop: "100px",
+            }}
+            display="flex"
+            justifyContent="center"
+          >
+            {isFetching && <CircularProgress />}
+            <Waypoint onEnter={() => fetchNextPage()} />
+          </Grid>
         </Grid>
       )}
     </>
