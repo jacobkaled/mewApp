@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import { API_KEY } from "../actions";
 
-const fetchCats = async () => {
+const fetchCat = async (id: string) => {
   const headers = new Headers({
     "Content-Type": "application/json",
-    "x-api-key": "DEMO-API-KEY",
+    "x-api-key": API_KEY,
   });
 
   type CatResp = Array<{
@@ -20,15 +21,16 @@ const fetchCats = async () => {
   };
 
   const res = await fetch(
-    "https://api.thecatapi.com/v1/images/search?limit=10",
+    `https://api.thecatapi.com/v1/images/${id}`,
     requestOptions
   );
   const res1 = await res.json();
+  console.log("one-cat", res1);
   return res1 as CatResp;
 };
 
-const useGetCats = () => {
-  return useQuery(["fetchCat"], fetchCats);
+const useGetCat = (id: string) => {
+  return useQuery(["fetchIndividualCat"], () => fetchCat(id));
 };
 
-export default useGetCats;
+export default useGetCat;

@@ -21,8 +21,10 @@ const Cats = () => {
                 <img
                   src={cat.url}
                   alt="cat image"
-                  width={cat.height}
-                  height={cat.height}
+                  // width={cat.height}
+                  // height={cat.height}
+                  width="100px"
+                  height="100px"
                 />
               </Grid>
             ))}

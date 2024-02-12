@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-const API_KEY =
+export const API_KEY =
   "live_puw6ufBzDBnh6Wyde05s6J81oK1NS9lWzyignHoXN5yUhwYJeKPjLbCYF2zNMgIq";
 
 const fetchCats = async () => {
