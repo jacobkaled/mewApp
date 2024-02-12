@@ -1,5 +1,5 @@
 import { useGetCatsBreeds } from "./actions";
-import { Grid, Link } from "@mui/material";
+import { Grid } from "@mui/material";
 
 const Breeds = () => {
   const { data, isLoading } = useGetCatsBreeds();
@@ -12,7 +12,7 @@ const Breeds = () => {
           <Grid>
             {data.map((breed) => (
               //   <Link to="">{breed.name}</Link>
-              <a href="">{breed.name}</a>
+              <a href={`../breeds/${breed.id}`}>{breed.name}</a>
             ))}
           </Grid>
         </Grid>
