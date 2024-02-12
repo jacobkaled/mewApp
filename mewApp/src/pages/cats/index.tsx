@@ -1,3 +1,4 @@
+import { Grid } from "@mui/material";
 import useGetCats from "./actions";
 
 const Cats = () => {
@@ -6,9 +7,26 @@ const Cats = () => {
   return (
     <>
       {isLoading ? (
-        <div>...loading </div>
+        <Grid>...loading </Grid>
       ) : (
-        <div>{data && data.map((cat) => <div>{cat.id}</div>)}</div>
+        <Grid container>
+          {data &&
+            data.map((cat) => (
+              <Grid container display="flex" flexDirection="column">
+                <Grid>{cat.height}</Grid>
+                <Grid>{cat.width}</Grid>
+                <Grid>
+                  <a href={`../cats/${cat.id}`}>{cat.id}</a>
+                </Grid>
+                <img
+                  src={cat.url}
+                  alt="cat image"
+                  width={cat.height}
+                  height={cat.height}
+                />
+              </Grid>
+            ))}
+        </Grid>
       )}
     </>
   );
