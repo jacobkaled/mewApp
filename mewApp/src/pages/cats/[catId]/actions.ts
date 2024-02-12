@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { API_KEY } from "../actions";
+import { API_KEY, Cat } from "../actions";
+
+// type CatResp = {
+//   height: number;
+//   id: string;
+//   url: string;
+//   width: number;
+// };
 
 const fetchCat = async (id: string) => {
   const headers = new Headers({
     "Content-Type": "application/json",
     "x-api-key": API_KEY,
   });
-
-  type CatResp = Array<{
-    height: number;
-    id: string;
-    url: string;
-    width: number;
-  }>;
 
   const requestOptions: RequestInit = {
     method: "GET",
@@ -25,12 +25,11 @@ const fetchCat = async (id: string) => {
     requestOptions
   );
   const res1 = await res.json();
-  console.log("one-cat", res1);
-  return res1 as CatResp;
+  return res1;
 };
 
 const useGetCat = (id: string) => {
-  return useQuery(["fetchIndividualCat"], () => fetchCat(id));
+  return useQuery<Cat>(["fetchIndividualCat"], () => fetchCat(id));
 };
 
 export default useGetCat;
