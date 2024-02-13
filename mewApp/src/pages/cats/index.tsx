@@ -1,18 +1,17 @@
 import { CircularProgress, Grid } from "@mui/material";
-import useGetCats from "./actions";
+import useGetCats, { CatsResp } from "./actions";
 import { Waypoint } from "react-waypoint";
 
 const Cats = () => {
   const { data, isLoading, isFetching, fetchNextPage } = useGetCats();
-  const combinedData = data ? data.pages.flat() : [];
+  const combinedData = data ? (data.pages.flat() as CatsResp) : [];
 
   console.log("combinedData==>", data);
 
   return (
     <>
-      {isLoading ? (
-        <Grid>...loading </Grid>
-      ) : (
+      {isLoading && <Grid>...loading </Grid>}
+      {data && (
         <Grid container>
           {data &&
             combinedData.map((cat) => (

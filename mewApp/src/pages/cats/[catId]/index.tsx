@@ -9,15 +9,18 @@ const Cat = () => {
   return (
     <>
       {isLoading && <Grid>...loading </Grid>}
-      {data && (
+      {data && data.breeds && (
         <Grid>
           {data.breeds.length > 0 ? (
-            <Grid>{data.breeds.map((breed) => breed.name)}</Grid>
+            <Grid>
+              <a href="">{data.breeds.map((breed) => breed.name)}</a>
+            </Grid>
           ) : (
             <Grid> NO Breeds !!.. </Grid>
           )}
         </Grid>
       )}
+      {data && <Grid>url : {data.url}</Grid>}
     </>
   );
 };
