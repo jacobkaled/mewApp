@@ -1,12 +1,7 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  Grid,
-} from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import { useGetFavs } from "./actions";
 import { useState } from "react";
+import RemoveModal from "./components/RemoveModal";
 
 const Favorites = () => {
   const { data, isLoading } = useGetFavs();
@@ -27,7 +22,7 @@ const Favorites = () => {
         </Grid>
       )}
 
-      <DeleteModal
+      <RemoveModal
         title="do you want to remove this cat from favorite list?"
         isLoading={false}
         isDeleteModalOpen={!!selectedFavCat}
@@ -37,34 +32,5 @@ const Favorites = () => {
     </Grid>
   );
 };
-
-type DeleteModalProps = {
-  title: string;
-  isLoading: boolean;
-  isDeleteModalOpen: boolean;
-  onCloseModal: () => void;
-  onDeleteAttribute: () => void;
-};
-
-export function DeleteModal(props: DeleteModalProps) {
-  const {
-    isLoading,
-    title,
-    isDeleteModalOpen,
-    onCloseModal,
-    onDeleteAttribute,
-  } = props;
-  return (
-    <Dialog open={isDeleteModalOpen} maxWidth="sm" onClose={onCloseModal}>
-      <DialogTitle>{title}</DialogTitle>
-      <DialogActions>
-        <Button onClick={onCloseModal}>close</Button>
-        <Button onClick={onDeleteAttribute} autoFocus disabled={isLoading}>
-          {isLoading ? "Loading" : "delete"}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
 
 export default Favorites;
