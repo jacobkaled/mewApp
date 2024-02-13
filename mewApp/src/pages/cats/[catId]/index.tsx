@@ -10,7 +10,7 @@ import {
 import GradeIcon from "@mui/icons-material/Grade";
 import { useState } from "react";
 import BasicModal from "../../../components/basicModal";
-import useGetCats, { CatsResp } from "../actions";
+import useGetCats, { Breed, CatsResp } from "../actions";
 import { Waypoint } from "react-waypoint";
 
 const Cat = () => {
@@ -19,59 +19,51 @@ const Cat = () => {
   const { mutate, isLoading: isMutating } = useMakeCatFav(catId!);
   const [selectedBreed, setSelectedBreed] = useState("");
 
-  const handleSelecetedBreed = (breedId: string) => {
-    setSelectedBreed(breedId);
-  };
-
   const closeBreedModal = () => {
     setSelectedBreed("");
   };
+  const handleSelectBreed = (breedId: string) => {
+    setSelectedBreed(breedId);
+  };
 
   return (
-    <>
+    <Grid
+      container
+      marginX="auto"
+      width="800px"
+      bgcolor="red"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      gap="15px"
+    >
       {isLoading && <Grid>...loading </Grid>}
-      {data && data.breeds && (
-        <Grid>
-          {data.breeds.length > 0 ? (
-            <Grid>
-              {/* <a href="./"> */}
-              <Button>
-                <Typography>
-                  {data.breeds.map((breed) => (
-                    <Typography onClick={() => setSelectedBreed(breed.id)}>
-                      {breed.name}
-                    </Typography>
-                  ))}
-                </Typography>
-              </Button>
-              {/* </a> */}
-            </Grid>
-          ) : (
-            <Grid> NO Breeds !!.. </Grid>
-          )}
-        </Grid>
-      )}
+
       {data && (
         <>
+          {!data.breeds && <Grid> NO Breeds available for this cat !!.. </Grid>}
           <img src={data.url} />
+          <IconButton onClick={() => mutate()} disabled={isMutating}>
+            <Typography>make favorite</Typography>
+            <GradeIcon />
+          </IconButton>
+          {data.breeds && data.breeds.length > 0 && (
+            <BreedsList
+              breedsList={data.breeds}
+              onSelectBreed={handleSelectBreed}
+            />
+          )}
         </>
-      )}
-      {data && (
-        <IconButton onClick={() => mutate()} disabled={isMutating}>
-          <Typography>make favorite</Typography>
-          <GradeIcon />
-        </IconButton>
       )}
 
       <BasicModal open={!!selectedBreed} onClose={closeBreedModal}>
-        breeeed id ={selectedBreed}
-        <BreedList breedid={selectedBreed} />
+        <CatsList breedid={selectedBreed} />
       </BasicModal>
-    </>
+    </Grid>
   );
 };
 
-const BreedList = ({ breedid }: { breedid: string }) => {
+const CatsList = ({ breedid }: { breedid: string }) => {
   const { data, isLoading, isFetching, fetchNextPage } = useGetCats(breedid);
   const combinedData = data ? (data.pages.flat() as CatsResp) : [];
 
@@ -118,14 +110,28 @@ const BreedList = ({ breedid }: { breedid: string }) => {
   );
 };
 
-// const BreedModal = ({
-//   selectedBreed,
-//   handleSelecetedBreed,
-// }: {
-//   selectedBreed: boolean;
-//   handleSelecetedBreed: () => void;
-// }) => {
-
-// };
+const BreedsList = ({
+  breedsList,
+  onSelectBreed,
+}: {
+  breedsList: Array<Breed>;
+  onSelectBreed: (breedId: string) => void;
+}) => {
+  return (
+    <Grid>
+      {/* <a href="./"> */}
+      <Button>
+        <Typography>
+          {breedsList.map((breed) => (
+            <Typography onClick={() => onSelectBreed(breed.id)}>
+              {breed.name}
+            </Typography>
+          ))}
+        </Typography>
+      </Button>
+      {/* </a> */}
+    </Grid>
+  );
+};
 
 export default Cat;
