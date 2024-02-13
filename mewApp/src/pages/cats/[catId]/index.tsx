@@ -1,10 +1,12 @@
 import { useParams } from "react-router";
-import useGetCat from "./actions";
-import { Grid } from "@mui/material";
+import useGetCat, { useMakeCatFav } from "./actions";
+import { Grid, IconButton, Typography } from "@mui/material";
+import GradeIcon from "@mui/icons-material/Grade";
 
 const Cat = () => {
   const { catId } = useParams();
   const { data, isLoading } = useGetCat(catId!);
+  const { mutate, isLoading: isMutating } = useMakeCatFav(catId!);
 
   return (
     <>
@@ -13,14 +15,26 @@ const Cat = () => {
         <Grid>
           {data.breeds.length > 0 ? (
             <Grid>
-              <a href="">{data.breeds.map((breed) => breed.name)}</a>
+              <a href="./">
+                <Typography>
+                  {data.breeds.map((breed) => breed.name)}
+                </Typography>
+              </a>
             </Grid>
           ) : (
             <Grid> NO Breeds !!.. </Grid>
           )}
         </Grid>
       )}
-      {data && <Grid>url : {data.url}</Grid>}
+      {data && (
+        <Typography style={{ color: "black" }}>url : {data.url}</Typography>
+      )}
+      {data && (
+        <IconButton onClick={() => mutate()} disabled={isMutating}>
+          <Typography>make favorite</Typography>
+          <GradeIcon />
+        </IconButton>
+      )}
     </>
   );
 };
