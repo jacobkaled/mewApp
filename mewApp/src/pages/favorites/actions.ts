@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_KEY } from "../cats/actions";
 import { Favorite } from "@mui/icons-material";
 
@@ -29,5 +29,34 @@ export const fetchFavs = async () => {
 };
 
 export const useGetFavs = () => {
-  return useQuery<Array<Favorite>>(["fetchIndividualCat"], fetchFavs);
+  return useQuery<Array<Favorite>>(["fetchFavorites"], fetchFavs);
+};
+
+// remove cat from Favs  ........  //
+export const removeFromFavs = async (favId: string) => {
+  const headers = new Headers({
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  });
+  const requestOptions: RequestInit = {
+    method: "DELETE",
+    headers: headers,
+  };
+
+  return fetch(
+    `https://api.thecatapi.com/v1/favourites/${favId}`,
+    requestOptions
+  ).then((res) => res.json());
+  // .then((data) => console.log("favs", data));
+};
+
+export const useRemoveFromFavs = (onSuccess?: () => void) => {
+  const queryClient = useQueryClient();
+  return useMutation(["RemoveFromFavs"], (favId) => removeFromFavs(favId), {
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries(["fetchFavorites"])
+        .then(() => onSuccess && onSuccess());
+    },
+  });
 };
