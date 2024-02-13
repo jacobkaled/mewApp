@@ -49,7 +49,7 @@ export type Cat = {
   id: string;
   url: string;
   width: number;
-  favourite?: any;
+  favourite?: boolean;
   breeds: Breeds | [];
 };
 
