@@ -3,7 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 export const API_KEY =
   "live_puw6ufBzDBnh6Wyde05s6J81oK1NS9lWzyignHoXN5yUhwYJeKPjLbCYF2zNMgIq";
 
-type Breed = {
+export type Breed = {
   weight?: { imperial: string; metric: string };
   adaptability?: number;
   affection_level?: number;
@@ -41,13 +41,16 @@ type Breed = {
   vetstreet_url?: string;
   vocalisation?: number;
 };
+
+export type Breeds = Array<Breed>;
+
 export type Cat = {
   height: number;
   id: string;
   url: string;
   width: number;
   favourite?: any;
-  breeds: Array<Breed> | [];
+  breeds: Breeds | [];
 };
 
 export type CatsResp = Array<Cat>;
