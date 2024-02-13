@@ -1,10 +1,10 @@
-import { Button, Grid } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { useGetFavs, useRemoveFromFavs } from "./actions";
 import { useState } from "react";
 import RemoveModal from "./components/RemoveModal";
 
 const Favorites = () => {
-  const { data, isLoading } = useGetFavs();
+  const { data, isLoading, isSuccess } = useGetFavs();
   const [selectedFavCat, setSelectedFavCat] = useState<number | null>(null);
   const { mutate, isLoading: isRemoving } = useRemoveFromFavs(() =>
     setSelectedFavCat(null)
@@ -12,16 +12,24 @@ const Favorites = () => {
   return (
     <Grid>
       {isLoading && <Grid> ... isloading</Grid>}
-      {data && (
+      {isSuccess && data && (
         <Grid>
-          {data.map((fav) => (
+          {data.length === 0 ? (
             <Grid>
-              <img src={fav.image.url} />
-              <Button onClick={() => setSelectedFavCat(fav.id)}>
-                remove from favourite
-              </Button>
+              <Typography>No Favorite cats in da house</Typography>
             </Grid>
-          ))}
+          ) : (
+            <Grid>
+              {data.map((fav) => (
+                <Grid>
+                  <img src={fav.image.url} />
+                  <Button onClick={() => setSelectedFavCat(fav.id)}>
+                    remove from favourite
+                  </Button>
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Grid>
       )}
       {selectedFavCat && (
