@@ -1,5 +1,8 @@
+import { useGetFavs } from "./actions";
+
 const Favorites = () => {
-  return <div>this is cats main route</div>;
+  const { data } = useGetFavs();
+  return <div>this is cats FAAAVS</div>;
 };
 
 export default Favorites;
