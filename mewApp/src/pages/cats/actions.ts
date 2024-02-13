@@ -55,7 +55,7 @@ export type Cat = {
 
 export type CatsResp = Array<Cat>;
 
-export const fetchCats = async (page: string) => {
+export const fetchCats = async (page: string, breedId?: string) => {
   const headers = new Headers({
     "Content-Type": "application/json",
     "x-api-key": API_KEY,
@@ -68,6 +68,8 @@ export const fetchCats = async (page: string) => {
   const queryParams = new URLSearchParams({
     page,
     limit: "5",
+    breed_ids: breedId ?? "",
+    //has_breeds: "1", //temporarily
   }).toString();
 
   return fetch(
@@ -77,13 +79,13 @@ export const fetchCats = async (page: string) => {
   //.then((data) => console.log("data", data));
 };
 
-export const useGetCats = () => {
+export const useGetCats = (breedId?: string) => {
   return useInfiniteQuery<CatsResp>(
     {
       queryKey: ["fetch-cats"],
       queryFn: ({ pageParam }: { pageParam: number }) => {
         console.log("pageParam", pageParam);
-        return fetchCats((pageParam ?? 0).toString());
+        return fetchCats((pageParam ?? 0).toString(), breedId ?? undefined);
       },
       getNextPageParam: (lastPage: CatsResp, allPages: CatsResp) => {
         return allPages ? allPages.length + 1 : 0;
