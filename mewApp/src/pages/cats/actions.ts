@@ -7,6 +7,9 @@ export type QueryParams = {
   limit?: string;
   page?: string;
   breed_ids?: string;
+  category_ids?: string;
+  has_breeds?: string;
+  sub_id?: string;
 };
 
 export type Breed = {
@@ -66,7 +69,7 @@ export const fetchCats = async (params: QueryParams) => {
 
   for (const key in params) {
     if (params[key] !== undefined && params[key] !== null) {
-      searchParams.append(key, params[key].toString());
+      searchParams.append(key, params[key]!.toString());
     }
   }
 
@@ -102,7 +105,7 @@ export const useGetCats = (
 ) => {
   return useInfiniteQuery<CatsResp>(
     {
-      queryKey: ["fetch-cats"],
+      queryKey: ["fetch-cats", JSON.stringify(queryParams)],
       queryFn: ({ pageParam }: { pageParam: number }) => {
         return fetchCats({
           ...queryParams,
@@ -113,7 +116,7 @@ export const useGetCats = (
       getNextPageParam: (_: CatsResp, allPages: CatsResp) => {
         return allPages ? allPages.length : 0;
       },
-      staleTime: 20000,
+      staleTime: 20000000,
     },
     {
       keepPreviousData: true,

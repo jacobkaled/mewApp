@@ -2,18 +2,16 @@ import { useParams } from "react-router";
 import useGetCat, { useMakeCatFav } from "./actions";
 import {
   Button,
+  Card,
   CircularProgress,
   Grid,
-  IconButton,
   Typography,
 } from "@mui/material";
 import GradeIcon from "@mui/icons-material/Grade";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import BasicModal from "../../../components/basicModal";
 import useGetCats, { Breed, CatsResp } from "../actions";
 import { Waypoint } from "react-waypoint";
-import ImageLoader from "../../../components/imageLoader";
-import { useImage } from "react-image";
 
 const Cat = () => {
   const { catId } = useParams();
@@ -21,7 +19,6 @@ const Cat = () => {
   const { mutate, isLoading: isMutating } = useMakeCatFav(catId!);
   const [selectedBreed, setSelectedBreed] = useState("");
 
-  console.log("rrerender =====>");
   const closeBreedModal = () => {
     setSelectedBreed("");
   };
@@ -34,39 +31,49 @@ const Cat = () => {
       container
       marginX="auto"
       width="800px"
-      bgcolor="red"
       display="flex"
       flexDirection="column"
       alignItems="center"
       gap="15px"
     >
-      {isLoading && <Grid>...loading </Grid>}
+      {isLoading && (
+        <Grid>
+          <CircularProgress />
+        </Grid>
+      )}
 
       {isSuccess && data && (
         <>
-          {!data.breeds && <Grid> NO Breeds available for this cat !!.. </Grid>}
-
-          {/* <img
-            src={data.url}
-            width="100%"
-            alt="sss"
-            loading="lazy"
-            key={data.url}
-          /> */}
-          {/* <ImageLoader src={data.url} /> */}
-          <Suspense fallback={<>....loading</>}>
-            <MyImageComponent url={data.url} />
-          </Suspense>
-
-          <IconButton onClick={() => mutate()} disabled={isMutating}>
-            <Typography>make favorite</Typography>
-            <GradeIcon />
-          </IconButton>
-          {data.breeds && data.breeds.length > 0 && (
+          <img src={data.url} style={{ maxWidth: "100%" }} />
+          {data.favourite ? (
+            <Typography>your cat has been added to favorites</Typography>
+          ) : (
+            <Button
+              onClick={() => mutate()}
+              disabled={isMutating}
+              sx={{ display: "flex", gap: "10px", alignItems: "center" }}
+            >
+              <Typography>add this cat to favorite</Typography>
+              <GradeIcon />
+            </Button>
+          )}
+          {data.breeds && data.breeds.length > 0 ? (
             <BreedsList
               breedsList={data.breeds}
               onSelectBreed={handleSelectBreed}
             />
+          ) : (
+            <Card
+              variant="elevation"
+              sx={{
+                marginTop: "10px",
+                padding: "20px",
+                textAlign: "center",
+                border: "1px solid lightGrey",
+              }}
+            >
+              <Typography>NO Breeds available for this cat !!.. </Typography>
+            </Card>
           )}
         </>
       )}
@@ -101,10 +108,8 @@ const CatsList = ({ breedid }: { breedid: string }) => {
                 <img
                   src={cat.url}
                   alt="cat image"
-                  // width={cat.height}
-                  // height={cat.height}
-                  width="100px"
-                  // height="100px"
+                  width="100%"
+                  style={{ aspectRatio: "1/1" }}
                 />
               </Grid>
             ))}
@@ -137,6 +142,7 @@ const BreedsList = ({
   return (
     <Grid>
       {/* <a href="./"> */}
+      <Typography> Available Breeds </Typography>
       <Button>
         <Typography>
           {breedsList.map((breed) => (
@@ -150,13 +156,5 @@ const BreedsList = ({
     </Grid>
   );
 };
-
-function MyImageComponent({ url }: { url: string }) {
-  const { src } = useImage({
-    srcList: url,
-  });
-
-  return <img src={src} />;
-}
 
 export default Cat;

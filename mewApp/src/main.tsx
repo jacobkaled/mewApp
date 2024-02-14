@@ -19,7 +19,6 @@ const Layout = () => {
       <NavBar />
       <Grid
         id="main-layout"
-        container
         width="100vw"
         height="calc(100vh - 80px)"
         overflow="auto"

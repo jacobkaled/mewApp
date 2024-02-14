@@ -1,29 +1,40 @@
 import { Button, CircularProgress, Grid, Link } from "@mui/material";
 import useGetCats, { CatsResp } from "./actions";
 import { Link as RouterLink } from "react-router-dom";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import StarIcon from "@mui/icons-material/Star";
 import { useRef } from "react";
 
 const Cats = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { data, isLoading, isFetching, fetchNextPage } = useGetCats({}, () => {
     const layout = document.getElementById("main-layout");
-    //layout && layout.scrollTo(0, layout.scrollHeight);
-    layout && layout.scrollIntoView(false);
+
+    if (layout) {
+      const lastElement = layout.lastElementChild;
+      if (lastElement) {
+        lastElement.scrollIntoView({ behavior: "smooth" });
+      }
+    }
   });
   const combinedData = data ? (data.pages.flat() as CatsResp) : [];
 
   return (
     <>
-      {isLoading && <Grid>...loading </Grid>}
+      {isLoading && (
+        <Grid>
+          <CircularProgress />
+        </Grid>
+      )}
       {data && (
         <Grid
           container
           display="flex"
           flexWrap="wrap"
-          justifyContent="center"
+          justifyContent="flex-start"
           ref={ref}
           overflow="scroll"
-          width="auto"
+          width="100%"
           height="auto"
         >
           {data &&
@@ -31,14 +42,29 @@ const Cats = () => {
               <Grid
                 container
                 display="flex"
+                position="relative"
                 flexDirection="row"
                 justifyContent="flex-end"
+                alignContent="flex-start"
                 width="auto"
+                height="auto"
                 gap="20px"
                 key={`Cat-${cat.id}-photo`}
               >
+                <Grid
+                  position="absolute"
+                  top={0}
+                  left={0}
+                  padding="10px"
+                  gap="5px"
+                >
+                  {cat.breeds && cat.breeds.length > 0 && <AccountCircleIcon />}
+                  {cat.favourite && <StarIcon />}
+                </Grid>
+
                 <Link component={RouterLink} to={`../cats/${cat.id}`}>
                   <Grid
+                    item
                     sx={{
                       background: `url(${cat.url})`,
                       backgroundSize: "cover",
@@ -47,14 +73,6 @@ const Cats = () => {
                     height="150px"
                   />
                 </Link>
-                {/* <img
-                  src={cat.url}
-                  alt="cat image"
-                  // width={cat.height}
-                  // height={cat.height}
-                  width="100%"
-                  // height="100px"
-                /> */}
               </Grid>
             ))}
           <Grid
