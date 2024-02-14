@@ -3,6 +3,12 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 export const API_KEY =
   "live_puw6ufBzDBnh6Wyde05s6J81oK1NS9lWzyignHoXN5yUhwYJeKPjLbCYF2zNMgIq";
 
+export type QueryPArams = {
+  limit?: string;
+  page?: string;
+  breed_ids?: string;
+};
+
 export type Breed = {
   weight?: { imperial: string; metric: string };
   adaptability?: number;
@@ -55,7 +61,16 @@ export type Cat = {
 
 export type CatsResp = Array<Cat>;
 
-export const fetchCats = async (page: string, breedId?: string) => {
+//export const fetchCats = async (page: string, breedId?: string) => {
+export const fetchCats = async (params: QueryPArams) => {
+  const searchParams = new URLSearchParams();
+
+  for (const key in params) {
+    if (params[key] !== undefined && params[key] !== null) {
+      searchParams.append(key, params[key].toString());
+    }
+  }
+
   const headers = new Headers({
     "Content-Type": "application/json",
     "x-api-key": API_KEY,
@@ -65,64 +80,43 @@ export const fetchCats = async (page: string, breedId?: string) => {
     headers: headers,
     redirect: "follow",
   };
-  const queryParams = new URLSearchParams({
-    page,
-    limit: "5",
-    breed_ids: breedId ?? "",
-    //has_breeds: "1", //temporarily
-  }).toString();
+  //   const queryParams = new URLSearchParams(
+  //     //{
+  //     // page,
+  //     // limit: "5",
+  //     // breed_ids: breedId ?? "",
+  //     //has_breeds: "1", //temporarily
+  //     //}
+  //     { ...args }
+  //   ).toString();
 
   return fetch(
-    `https://api.thecatapi.com/v1/images/search?${queryParams}`,
+    `https://api.thecatapi.com/v1/images/search?${searchParams.toString()}`,
     requestOptions
   ).then((res) => res.json());
   //.then((data) => console.log("data", data));
 };
 
-export const useGetCats = (breedId?: string) => {
+export const useGetCats = (queryParams: QueryPArams) => {
   return useInfiniteQuery<CatsResp>(
     {
       queryKey: ["fetch-cats"],
       queryFn: ({ pageParam }: { pageParam: number }) => {
-        console.log("pageParam", pageParam);
-        return fetchCats((pageParam ?? 0).toString(), breedId ?? undefined);
+        return fetchCats({
+          ...queryParams,
+          limit: "5",
+          page: (pageParam ?? 0).toString(),
+        });
       },
       getNextPageParam: (lastPage: CatsResp, allPages: CatsResp) => {
-        return allPages ? allPages.length + 1 : 0;
-        // lastPage.meta.hasNextPage
-        //   ? lastPage.meta.offset + lastPage.meta.limit
-        //   : undefined,
+        return allPages ? allPages.length : 0;
       },
+      staleTime: 20000,
     },
     {
       keepPreviousData: true,
     }
   );
 };
-
-// const fetchCats = async () => {
-//   const headers = new Headers({
-//     "Content-Type": "application/json",
-//     "x-api-key": API_KEY,
-//   });
-
-//   const requestOptions: RequestInit = {
-//     method: "GET",
-//     headers: headers,
-//     redirect: "follow",
-//   };
-
-//   const res = await fetch(
-//     "https://api.thecatapi.com/v1/images/search?limit=5",
-//     requestOptions
-//   );
-//   const res1 = await res.json();
-//   console.log("data=>", res1);
-//   return res1 as CatsResp;
-// };
-
-// const useGetCats = () => {
-//   return useQuery(["fetchCats"], fetchCats);
-// };
 
 export default useGetCats;
