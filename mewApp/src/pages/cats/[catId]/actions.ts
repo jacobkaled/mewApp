@@ -1,11 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { API_KEY, Cat } from "../../../types";
-import { CATS_URL, requestOptions } from "../../../utils";
+import { Cat } from "../../../types";
+import { CATS_URL, headers, requestOptions } from "../../../utils";
+
+// -----  get individual Cat ------ //
 
 const fetchCat = async (id: string) => {
-  const res = await fetch(`${CATS_URL}/images/${id}`, requestOptions);
-  const res1 = await res.json();
-  return res1;
+  return fetch(`${CATS_URL}/images/${id}`, requestOptions).then((resp) =>
+    resp.json()
+  );
 };
 
 const useGetCat = (id: string) => {
@@ -14,14 +16,9 @@ const useGetCat = (id: string) => {
   });
 };
 
-////// --------- create favs cats------------------- //
+// --------- create favourite cat ------------------- //
 
 const makeCatFav = async (imageId: string) => {
-  const headers = new Headers({
-    "Content-Type": "application/json",
-    "x-api-key": API_KEY,
-  });
-
   const requestOptions: RequestInit = {
     method: "POST",
     headers: headers,
@@ -30,15 +27,13 @@ const makeCatFav = async (imageId: string) => {
     }),
   };
 
-  const res = await fetch(`${CATS_URL}/favourites`, requestOptions);
-  const res1 = await res.json();
-  return res1;
+  return fetch(`${CATS_URL}/favourites`, requestOptions).then((resp) =>
+    resp.json()
+  );
 };
 
-type FavResp = { id: string; message: string };
-
 export const useMakeCatFav = (imageId: string, onSuccess?: () => void) => {
-  return useMutation<FavResp>(["MakeCatFav"], () => makeCatFav(imageId), {
+  return useMutation(["MakeCatFav"], () => makeCatFav(imageId), {
     onSuccess,
   });
 };

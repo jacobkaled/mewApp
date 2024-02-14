@@ -18,6 +18,7 @@ export type QueryParams = {
   category_ids?: string;
   has_breeds?: string;
   sub_id?: string;
+  [key: string]: string | number | undefined;
 };
 
 export type Breed = {

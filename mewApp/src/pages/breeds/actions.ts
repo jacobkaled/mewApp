@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { API_KEY, Breeds } from "../cats/actions";
+import { API_KEY, Breeds } from "../../types";
 
 export const fetchBreeds = async () => {
   const headers = new Headers({

@@ -16,7 +16,6 @@ export const removeFromFavs = async (favId: string) => {
   return fetch(`${CATS_URL}/favourites/${favId}`, requestOptions).then((res) =>
     res.json()
   );
-  // .then((data) => console.log("favs", data));
 };
 
 export const useRemoveFromFavs = (onSuccess?: () => void) => {

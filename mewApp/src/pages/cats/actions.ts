@@ -1,18 +1,10 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { CatsResp, QueryParams } from "../../types";
-import { CATS_URL, requestOptions } from "../../utils";
+import { CATS_URL, objectToQueryParams, requestOptions } from "../../utils";
 
 export const fetchCats = async (params: QueryParams) => {
-  const searchParams = new URLSearchParams();
-
-  for (const key in params) {
-    if (params[key] !== undefined && params[key] !== null) {
-      searchParams.append(key, params[key]!.toString());
-    }
-  }
-
   return fetch(
-    `${CATS_URL}/images/search?${searchParams.toString()}`,
+    `${CATS_URL}/images/search?${objectToQueryParams(params)}`,
     requestOptions
   ).then((res) => res.json());
   //.then((data) => console.log("data", data));
