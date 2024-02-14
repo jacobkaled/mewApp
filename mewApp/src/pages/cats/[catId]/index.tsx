@@ -8,17 +8,20 @@ import {
   Typography,
 } from "@mui/material";
 import GradeIcon from "@mui/icons-material/Grade";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import BasicModal from "../../../components/basicModal";
 import useGetCats, { Breed, CatsResp } from "../actions";
 import { Waypoint } from "react-waypoint";
+import ImageLoader from "../../../components/imageLoader";
+import { useImage } from "react-image";
 
 const Cat = () => {
   const { catId } = useParams();
-  const { data, isLoading } = useGetCat(catId!);
+  const { data, isLoading, isSuccess } = useGetCat(catId!);
   const { mutate, isLoading: isMutating } = useMakeCatFav(catId!);
   const [selectedBreed, setSelectedBreed] = useState("");
 
+  console.log("rrerender =====>");
   const closeBreedModal = () => {
     setSelectedBreed("");
   };
@@ -39,10 +42,22 @@ const Cat = () => {
     >
       {isLoading && <Grid>...loading </Grid>}
 
-      {data && (
+      {isSuccess && data && (
         <>
           {!data.breeds && <Grid> NO Breeds available for this cat !!.. </Grid>}
-          <img src={data.url} />
+
+          {/* <img
+            src={data.url}
+            width="100%"
+            alt="sss"
+            loading="lazy"
+            key={data.url}
+          /> */}
+          {/* <ImageLoader src={data.url} /> */}
+          <Suspense fallback={<>....loading</>}>
+            <MyImageComponent url={data.url} />
+          </Suspense>
+
           <IconButton onClick={() => mutate()} disabled={isMutating}>
             <Typography>make favorite</Typography>
             <GradeIcon />
@@ -64,7 +79,9 @@ const Cat = () => {
 };
 
 const CatsList = ({ breedid }: { breedid: string }) => {
-  const { data, isLoading, isFetching, fetchNextPage } = useGetCats(breedid);
+  const { data, isLoading, isFetching, fetchNextPage } = useGetCats({
+    breed_ids: breedid,
+  });
   const combinedData = data ? (data.pages.flat() as CatsResp) : [];
 
   //TODO ... reuse the same component from CAT.tsx
@@ -87,7 +104,7 @@ const CatsList = ({ breedid }: { breedid: string }) => {
                   // width={cat.height}
                   // height={cat.height}
                   width="100px"
-                  height="100px"
+                  // height="100px"
                 />
               </Grid>
             ))}
@@ -133,5 +150,13 @@ const BreedsList = ({
     </Grid>
   );
 };
+
+function MyImageComponent({ url }: { url: string }) {
+  const { src } = useImage({
+    srcList: url,
+  });
+
+  return <img src={src} />;
+}
 
 export default Cat;

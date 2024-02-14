@@ -29,7 +29,10 @@ const fetchCat = async (id: string) => {
 };
 
 const useGetCat = (id: string) => {
-  return useQuery<Cat>(["fetchIndividualCat"], () => fetchCat(id));
+  return useQuery<Cat>(["fetchIndividualCat", id], () => fetchCat(id), {
+    //keepPreviousData: false,
+    staleTime: 20000,
+  });
 };
 
 ////// --------- create favs cats------------------- //
