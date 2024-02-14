@@ -3,7 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 export const API_KEY =
   "live_puw6ufBzDBnh6Wyde05s6J81oK1NS9lWzyignHoXN5yUhwYJeKPjLbCYF2zNMgIq";
 
-export type QueryPArams = {
+export type QueryParams = {
   limit?: string;
   page?: string;
   breed_ids?: string;
@@ -61,8 +61,7 @@ export type Cat = {
 
 export type CatsResp = Array<Cat>;
 
-//export const fetchCats = async (page: string, breedId?: string) => {
-export const fetchCats = async (params: QueryPArams) => {
+export const fetchCats = async (params: QueryParams) => {
   const searchParams = new URLSearchParams();
 
   for (const key in params) {
@@ -97,7 +96,10 @@ export const fetchCats = async (params: QueryPArams) => {
   //.then((data) => console.log("data", data));
 };
 
-export const useGetCats = (queryParams: QueryPArams) => {
+export const useGetCats = (
+  queryParams: QueryParams,
+  onSuccsess?: () => void
+) => {
   return useInfiniteQuery<CatsResp>(
     {
       queryKey: ["fetch-cats"],
@@ -108,13 +110,14 @@ export const useGetCats = (queryParams: QueryPArams) => {
           page: (pageParam ?? 0).toString(),
         });
       },
-      getNextPageParam: (lastPage: CatsResp, allPages: CatsResp) => {
+      getNextPageParam: (_: CatsResp, allPages: CatsResp) => {
         return allPages ? allPages.length : 0;
       },
       staleTime: 20000,
     },
     {
       keepPreviousData: true,
+      onSuccess: onSuccsess?.(),
     }
   );
 };
