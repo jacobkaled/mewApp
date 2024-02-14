@@ -8,17 +8,27 @@ import Cat from "./pages/cats/[catId]/index.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Breeds from "./pages/breeds/index.tsx";
 import Breed from "./pages/breeds/[breedId]/index.tsx";
-import NavBar from "./components/NavBar.tsx";
+import NavBar from "./components/navBar/NavBar.tsx";
 import { Grid } from "@mui/material";
 
 const queryClient = new QueryClient();
 
 const Layout = () => {
   return (
-    <Grid width="100%" height="100vh">
+    <>
       <NavBar />
-      <Outlet />
-    </Grid>
+      <Grid
+        id="main-layout"
+        container
+        width="100vw"
+        height="calc(100vh - 80px)"
+        overflow="auto"
+        top="80px"
+        position="absolute"
+      >
+        <Outlet />
+      </Grid>
+    </>
   );
 };
 

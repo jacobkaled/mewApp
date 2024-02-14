@@ -1,30 +1,42 @@
-import { CircularProgress, Grid, Link } from "@mui/material";
+import { Button, CircularProgress, Grid, Link } from "@mui/material";
 import useGetCats, { CatsResp } from "./actions";
-import { Waypoint } from "react-waypoint";
 import { Link as RouterLink } from "react-router-dom";
+import { useRef } from "react";
 
 const Cats = () => {
-  const { data, isLoading, isFetching, fetchNextPage } = useGetCats({});
+  const ref = useRef<HTMLDivElement | null>(null);
+  const { data, isLoading, isFetching, fetchNextPage } = useGetCats({}, () => {
+    const layout = document.getElementById("main-layout");
+    //layout && layout.scrollTo(0, layout.scrollHeight);
+    layout && layout.scrollIntoView(false);
+  });
   const combinedData = data ? (data.pages.flat() as CatsResp) : [];
 
   return (
     <>
       {isLoading && <Grid>...loading </Grid>}
       {data && (
-        <Grid container display="flex" justifyContent="center">
+        <Grid
+          container
+          display="flex"
+          flexWrap="wrap"
+          justifyContent="center"
+          ref={ref}
+          overflow="scroll"
+          width="auto"
+          height="auto"
+        >
           {data &&
             combinedData.map((cat) => (
               <Grid
                 container
                 display="flex"
-                flexDirection="column"
-                alignItems="center"
+                flexDirection="row"
+                justifyContent="flex-end"
+                width="auto"
                 gap="20px"
                 key={`Cat-${cat.id}-photo`}
               >
-                {/* <Grid>
-                  <a href={`../cats/${cat.id}`}>{cat.id}</a>
-                </Grid> */}
                 <Link component={RouterLink} to={`../cats/${cat.id}`}>
                   <Grid
                     sx={{
@@ -49,14 +61,18 @@ const Cats = () => {
             container
             sx={{
               width: "100%",
-              height: "100px",
-              marginTop: "100px",
+              paddingY: "20px",
             }}
             display="flex"
             justifyContent="center"
           >
-            {isFetching && <CircularProgress />}
-            <Waypoint onEnter={() => fetchNextPage()} />
+            {isFetching ? (
+              <CircularProgress />
+            ) : (
+              <Button onClick={() => fetchNextPage()} disabled={isFetching}>
+                Get more Cats
+              </Button>
+            )}
           </Grid>
         </Grid>
       )}
