@@ -10,13 +10,18 @@ import {
 import GradeIcon from "@mui/icons-material/Grade";
 import { useState } from "react";
 import BasicModal from "../../../components/basicModal";
-import useGetCats, { Breed, CatsResp } from "../actions";
+import useGetCats from "../actions";
 import { Waypoint } from "react-waypoint";
+import { useNavigate } from "react-router-dom";
+import { Breed, CatsResp } from "../../../types";
 
 const Cat = () => {
   const { catId } = useParams();
+  const navigate = useNavigate();
   const { data, isLoading, isSuccess } = useGetCat(catId!);
-  const { mutate, isLoading: isMutating } = useMakeCatFav(catId!);
+  const { mutate, isLoading: isMutating } = useMakeCatFav(catId!, () =>
+    navigate("../cats")
+  );
   const [selectedBreed, setSelectedBreed] = useState("");
 
   const closeBreedModal = () => {
@@ -45,18 +50,27 @@ const Cat = () => {
       {isSuccess && data && (
         <>
           <img src={data.url} style={{ maxWidth: "100%" }} />
-          {data.favourite ? (
-            <Typography>your cat has been added to favorites</Typography>
-          ) : (
-            <Button
-              onClick={() => mutate()}
-              disabled={isMutating}
-              sx={{ display: "flex", gap: "10px", alignItems: "center" }}
-            >
-              <Typography>add this cat to favorite</Typography>
-              <GradeIcon />
-            </Button>
-          )}
+          <Card
+            sx={{
+              position: "fixed",
+              top: "100px",
+              right: "20px",
+              padding: "30px",
+            }}
+          >
+            {data.favourite ? (
+              <Typography>your cat has been added to favorites</Typography>
+            ) : (
+              <Button
+                onClick={() => mutate()}
+                disabled={isMutating}
+                sx={{ display: "flex", gap: "10px", alignItems: "center" }}
+              >
+                <Typography>add this cat to favorite</Typography>
+                <GradeIcon />
+              </Button>
+            )}
+          </Card>
           {data.breeds && data.breeds.length > 0 ? (
             <BreedsList
               breedsList={data.breeds}
@@ -139,9 +153,10 @@ const BreedsList = ({
   breedsList: Array<Breed>;
   onSelectBreed: (breedId: string) => void;
 }) => {
-  return (
-    <Grid>
-      {/* <a href="./"> */}
+  return breedsList && breedsList.length > 0 ? (
+    <Card
+      sx={{ position: "fixed", top: "100px", left: "20px", padding: "30px" }}
+    >
       <Typography> Available Breeds </Typography>
       <Button>
         <Typography>
@@ -152,8 +167,19 @@ const BreedsList = ({
           ))}
         </Typography>
       </Button>
-      {/* </a> */}
-    </Grid>
+    </Card>
+  ) : (
+    <Card
+      variant="elevation"
+      sx={{
+        marginTop: "10px",
+        padding: "20px",
+        textAlign: "center",
+        border: "1px solid lightGrey",
+      }}
+    >
+      <Typography>NO Breeds available for this cat !!.. </Typography>
+    </Card>
   );
 };
 

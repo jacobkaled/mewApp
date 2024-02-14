@@ -1,9 +1,10 @@
 import { Button, CircularProgress, Grid, Link } from "@mui/material";
-import useGetCats, { CatsResp } from "./actions";
+import useGetCats from "./actions";
 import { Link as RouterLink } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import StarIcon from "@mui/icons-material/Star";
 import { useRef } from "react";
+import { CatsResp } from "../../types";
 
 const Cats = () => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -62,16 +63,12 @@ const Cats = () => {
                   {cat.favourite && <StarIcon />}
                 </Grid>
 
-                <Link component={RouterLink} to={`../cats/${cat.id}`}>
-                  <Grid
-                    item
-                    sx={{
-                      background: `url(${cat.url})`,
-                      backgroundSize: "cover",
-                    }}
-                    width="300px"
-                    height="150px"
-                  />
+                <Link
+                  component={RouterLink}
+                  to={`../cats/${cat.id}`}
+                  sx={{ width: "400px", height: "250px", overflow: "hidden" }}
+                >
+                  <img src={cat.url} alt={cat.id} />
                 </Link>
               </Grid>
             ))}

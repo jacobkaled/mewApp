@@ -1,62 +1,62 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { API_KEY } from "../cats/actions";
-import { Favorite } from "@mui/icons-material";
-
-type Favorite = {
-  created_at: string;
-  id: number;
-  image: { id: string; url: string };
-  image_id: string;
-  sub_id: string | null;
-  user_id: string;
-};
-
-export const fetchFavs = async () => {
-  const headers = new Headers({
-    "Content-Type": "application/json",
-    "x-api-key": API_KEY,
-  });
-  const requestOptions: RequestInit = {
-    method: "GET",
-    headers: headers,
-    redirect: "follow",
-  };
-
-  return fetch(`https://api.thecatapi.com/v1/favourites`, requestOptions).then(
-    (res) => res.json()
-  );
-  // .then((data) => console.log("favs", data));
-};
-
-export const useGetFavs = () => {
-  return useQuery<Array<Favorite>>(["fetchFavorites"], fetchFavs);
-};
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { FavoritesRes } from "../../types";
+import { CATS_URL, headers, requestOptions } from "../../utils";
 
 // remove cat from Favs  ........  //
 export const removeFromFavs = async (favId: string) => {
-  const headers = new Headers({
-    "Content-Type": "application/json",
-    "x-api-key": API_KEY,
-  });
   const requestOptions: RequestInit = {
     method: "DELETE",
     headers: headers,
   };
 
-  return fetch(
-    `https://api.thecatapi.com/v1/favourites/${favId}`,
-    requestOptions
-  ).then((res) => res.json());
+  return fetch(`${CATS_URL}/favourites/${favId}`, requestOptions).then((res) =>
+    res.json()
+  );
   // .then((data) => console.log("favs", data));
 };
 
 export const useRemoveFromFavs = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
-  return useMutation(["RemoveFromFavs"], (favId) => removeFromFavs(favId), {
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries(["fetchFavorites"])
-        .then(() => onSuccess && onSuccess());
+  return useMutation(
+    ["RemoveFromFavs"],
+    (data: { favId: string }) => removeFromFavs(data.favId),
+    {
+      onSuccess: () => {
+        queryClient
+          .invalidateQueries(["fetchFavorites"])
+          .then(() => onSuccess && onSuccess());
+      },
+    }
+  );
+};
+
+export const fetchFavorites = async (pagenum: string) => {
+  return fetch(
+    `${CATS_URL}/favourites?limit=4&page=${pagenum}`,
+    requestOptions
+  ).then((res) => res.json());
+  // .then((data) => console.log("favs", data));
+};
+
+export const useGetFavsZ = (onSuccess?: () => void) => {
+  return useInfiniteQuery<FavoritesRes>(
+    {
+      queryKey: ["fetchFavorites"],
+      queryFn: ({ pageParam }: { pageParam: number }) => {
+        return fetchFavorites((pageParam ?? 0).toString());
+      },
+      getNextPageParam: (_: FavoritesRes, allPages: FavoritesRes) => {
+        return allPages ? allPages.length : 0;
+      },
+      staleTime: 20000000,
     },
-  });
+    {
+      keepPreviousData: true,
+      onSuccess,
+    }
+  );
 };
