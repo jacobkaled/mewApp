@@ -16,6 +16,8 @@ export const CatsList = ({
     useGetCats(queries);
   useScrollDown(ref, isFetching);
 
+  console.log("data =>", data);
+
   return (
     <>
       {isLoading && (
@@ -23,7 +25,7 @@ export const CatsList = ({
           <CircularProgress />
         </Grid>
       )}
-      {data && (
+      {data && data.pages && (
         <Grid
           container
           display="flex"

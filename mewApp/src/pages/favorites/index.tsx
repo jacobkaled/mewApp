@@ -17,6 +17,8 @@ const Favorites = () => {
   useScrollDown(ref, isFetching);
   const combinedData = data ? (data.pages.flat() as FavoritesRes) : [];
 
+  console.log("combinedData", combinedData);
+
   return (
     <>
       {isLoading && (

@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import useGetCat, { useMakeCatFav } from "./actions";
+import useGetCat from "./actions";
 import {
   Button,
   Card,
@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { CatsList } from "../../../components/catsList";
 import BreedsList from "./components/BreedsList";
 import { useModal } from "../../../hooks";
+import { useMakeCatFav } from "../../favorites/actions";
 
 const Cat = () => {
   const { catId } = useParams();

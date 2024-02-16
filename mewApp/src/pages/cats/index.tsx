@@ -1,4 +1,11 @@
-import { Box, Button, Grid, Link, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  InputAdornment,
+  Link,
+  TextField,
+} from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { useState } from "react";
 import BasicModal from "../../components/basicModal";
@@ -46,7 +53,28 @@ const Cats = () => {
         <BasicModal open={isOpen} onClose={handleCloseModal}>
           <Grid container justifyContent="center" alignItems="center">
             <img src={selectedImageUrl} width={"800px"} />
-            <Typography> Copy the image Url </Typography> <CopyAll />
+            <TextField
+              sx={{
+                width: "300px",
+                position: "absolute",
+                top: "30px",
+                backgroundColor: "white",
+                borderRadius: "10px",
+              }}
+              value={selectedImageUrl}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CopyAll
+                      onClick={() =>
+                        navigator.clipboard.writeText(selectedImageUrl)
+                      }
+                    />
+                  </InputAdornment>
+                ),
+              }}
+              variant="standard"
+            />
           </Grid>
         </BasicModal>
       )}

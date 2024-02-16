@@ -18,7 +18,6 @@ const NavBar = () => {
       }}
     >
       <NavLink to={"./cats"}>cats</NavLink>
-      <NavLink to={"./breeds"}>breeds</NavLink>
       <NavLink to={"./favorites"}>favorites</NavLink>
     </Card>
   );

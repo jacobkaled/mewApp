@@ -1,50 +1,21 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
-import Cats from "./pages/cats/index.tsx";
-import Favorites from "./pages/favorites/index.tsx";
-import Cat from "./pages/cats/[catId]/index.tsx";
+import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Breeds from "./pages/breeds/index.tsx";
-import Breed from "./pages/breeds/[breedId]/index.tsx";
-import NavBar from "./components/navBar/NavBar.tsx";
-import { Grid } from "@mui/material";
+import ToastContextProvider from "./contexts/ToastContext.tsx";
+import Router from "./Router.tsx";
 
 const queryClient = new QueryClient();
 
-const Layout = () => {
-  return (
-    <>
-      <NavBar />
-      <Grid
-        id="main-layout"
-        width="100vw"
-        height="calc(100vh - 80px)"
-        overflow="hidden"
-        top="80px"
-        position="absolute"
-      >
-        <Outlet />
-      </Grid>
-    </>
-  );
-};
-
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route path="/cats" element={<Cats />} />
-            <Route path="/breeds" element={<Breeds />} />
-            <Route path="/breeds/:breedId" element={<Breed />} />
-            <Route path="/favorites" element={<Favorites />} />
-            <Route path="/cats/:catId" element={<Cat />} />
-          </Route>
-        </Routes>
-      </QueryClientProvider>
-    </BrowserRouter>
+    <ToastContextProvider>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <Router />
+        </QueryClientProvider>
+      </BrowserRouter>
+    </ToastContextProvider>
   </React.StrictMode>
 );
