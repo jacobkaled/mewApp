@@ -1,60 +1,124 @@
-import { Button, CircularProgress, Grid, Typography } from "@mui/material";
-import { useRemoveFromFavs, useGetFavsZ } from "./actions";
-import { useState } from "react";
+import { Button, Card, CircularProgress, Grid } from "@mui/material";
+import { useRemoveFromFavs, useGetFavoriteCats } from "./actions";
+import { useRef, useState } from "react";
 import RemoveModal from "./components/RemoveModal";
 import { FavoritesRes } from "../../types";
+import { HeartBroken } from "@mui/icons-material";
+import { useScrollDown } from "../../hooks";
 
 const Favorites = () => {
-  const { data, isLoading, isSuccess, isFetching, fetchNextPage } =
-    useGetFavsZ();
+  const ref = useRef<HTMLDivElement | null>(null);
+  const { data, isLoading, hasNextPage, isFetching, fetchNextPage } =
+    useGetFavoriteCats();
   const [selectedFavCat, setSelectedFavCat] = useState<number | null>(null);
   const { mutate, isLoading: isRemoving } = useRemoveFromFavs(() =>
     setSelectedFavCat(null)
   );
+  useScrollDown(ref, isFetching);
   const combinedData = data ? (data.pages.flat() as FavoritesRes) : [];
 
   return (
-    <Grid>
-      {isLoading && <Grid> ... isloading</Grid>}
-      {isSuccess && data && (
-        <>
-          <Grid>
-            {combinedData.length === 0 ? (
-              <Grid>
-                <Typography>No Favorite cats in da house</Typography>
-              </Grid>
-            ) : (
-              <Grid>
-                {combinedData.map((fav) => (
-                  <Grid>
-                    <img src={fav.image.url} />
-                    <Button onClick={() => setSelectedFavCat(fav.id)}>
-                      remove from favourite
-                    </Button>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </Grid>
-          <Grid
-            container
-            sx={{
-              width: "100%",
-              paddingY: "20px",
-            }}
-            display="flex"
-            justifyContent="center"
-          >
-            {isFetching ? (
-              <CircularProgress />
-            ) : (
-              <Button onClick={() => fetchNextPage()} disabled={isFetching}>
-                Get more Cats
-              </Button>
-            )}
-          </Grid>
-        </>
+    <>
+      {isLoading && (
+        <Grid>
+          <CircularProgress />
+        </Grid>
       )}
+      {data && (
+        <Grid
+          container
+          display="flex"
+          flexWrap="wrap"
+          justifyContent="flex-start"
+          gap="20px"
+          overflow="scroll"
+          width="100%"
+          ref={ref}
+          height="100%"
+        >
+          {combinedData.length === 0 ? (
+            <Grid
+              width="100%"
+              height="100%"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              no Favorites Available
+            </Grid>
+          ) : (
+            <>
+              {data.pages.map((page) =>
+                (page as FavoritesRes).map((cat) => (
+                  <Card
+                    sx={{
+                      display: "flex",
+                      position: "relative",
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                      alignContent: "flex-start",
+                      width: "auto",
+                      height: "auto",
+                    }}
+                    key={`Cat-${cat.id}-photo`}
+                  >
+                    <Grid
+                      position="absolute"
+                      top={0}
+                      left={0}
+                      padding="10px"
+                      gap="5px"
+                    ></Grid>
+                    <Grid container display="flex" flexDirection="column">
+                      <Grid
+                        sx={{
+                          aspectRatio: "1/1",
+                          height: "300px",
+                          overflow: "hidden",
+                          padding: 0,
+                        }}
+                      >
+                        <img
+                          src={cat.image.url}
+                          alt={`favourite image number ${cat.image_id} `}
+                        />
+                      </Grid>
+
+                      {/* abstraction herre */}
+                      <Button onClick={() => setSelectedFavCat(cat.id)}>
+                        remove from favourite <HeartBroken />
+                      </Button>
+                    </Grid>
+                  </Card>
+                ))
+              )}
+              <Grid
+                container
+                sx={{
+                  width: "100%",
+                  paddingY: "20px",
+                }}
+                display="flex"
+                justifyContent="center"
+              >
+                {isFetching ? (
+                  <CircularProgress />
+                ) : (
+                  hasNextPage && (
+                    <Button
+                      onClick={() => fetchNextPage()}
+                      disabled={isFetching}
+                    >
+                      Get more Cats
+                    </Button>
+                  )
+                )}
+              </Grid>
+            </>
+          )}
+        </Grid>
+      )}
+
       {selectedFavCat && (
         <RemoveModal
           title="do you want to remove this cat from favorite list?"
@@ -64,7 +128,7 @@ const Favorites = () => {
           onDeleteAttribute={() => mutate({ favId: selectedFavCat.toString() })}
         />
       )}
-    </Grid>
+    </>
   );
 };
 
