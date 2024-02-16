@@ -6,7 +6,6 @@ export type Favorite = {
   sub_id: string | null;
   user_id: string;
 };
-export type FavoritesRes = Array<Favorite>;
 
 export const API_KEY =
   "live_puw6ufBzDBnh6Wyde05s6J81oK1NS9lWzyignHoXN5yUhwYJeKPjLbCYF2zNMgIq";
@@ -62,7 +61,7 @@ export type Breed = {
 
 export type Breeds = Array<Breed>;
 
-export type Cat = {
+export type CatData = {
   height: number;
   id: string;
   url: string;
@@ -71,4 +70,5 @@ export type Cat = {
   breeds: Breeds | [];
 };
 
-export type CatsResp = Array<Cat>;
+export type CatsResp = Array<CatData>;
+export type FavoritesRes = Array<Favorite>;
