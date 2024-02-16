@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import Cats from "./pages/cats";
 import Cat from "./pages/cats/[catId]";
 import Favorites from "./pages/favorites";
@@ -9,6 +9,7 @@ const Router = () => {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
+        <Route path="/" element={<Navigate to="/cats" replace />} />
         <Route path="/cats" element={<Cats />} />
         <Route path="/cats/:catId" element={<Cat />} />
         <Route path="/favorites" element={<Favorites />} />
