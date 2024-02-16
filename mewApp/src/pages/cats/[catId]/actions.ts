@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Cat } from "../../../types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CatData } from "../../../types";
 import { CATS_URL, headers, requestOptions } from "../../../utils";
 
 // -----  get individual Cat ------ //
@@ -11,7 +11,7 @@ const fetchCat = async (id: string) => {
 };
 
 const useGetCat = (id: string) => {
-  return useQuery<Cat>(["fetchIndividualCat", id], () => fetchCat(id), {
+  return useQuery<CatData>(["fetchIndividualCat", id], () => fetchCat(id), {
     staleTime: 20000,
   });
 };
@@ -33,8 +33,12 @@ const makeCatFav = async (imageId: string) => {
 };
 
 export const useMakeCatFav = (imageId: string, onSuccess?: () => void) => {
+  const queryClient = useQueryClient();
   return useMutation(["MakeCatFav"], () => makeCatFav(imageId), {
-    onSuccess,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["fetchFavorites"]);
+      onSuccess && onSuccess();
+    },
   });
 };
 

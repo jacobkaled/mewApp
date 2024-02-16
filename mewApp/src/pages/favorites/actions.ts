@@ -25,9 +25,8 @@ export const useRemoveFromFavs = (onSuccess?: () => void) => {
     (data: { favId: string }) => removeFromFavs(data.favId),
     {
       onSuccess: () => {
-        queryClient
-          .invalidateQueries(["fetchFavorites"])
-          .then(() => onSuccess && onSuccess());
+        queryClient.invalidateQueries(["fetchFavorites"]);
+        onSuccess && onSuccess();
       },
     }
   );
@@ -35,23 +34,24 @@ export const useRemoveFromFavs = (onSuccess?: () => void) => {
 
 export const fetchFavorites = async (pagenum: string) => {
   return fetch(
-    `${CATS_URL}/favourites?limit=4&page=${pagenum}`,
+    `${CATS_URL}/favourites?limit=10&page=${pagenum}`,
     requestOptions
   ).then((res) => res.json());
   // .then((data) => console.log("favs", data));
 };
 
-export const useGetFavsZ = (onSuccess?: () => void) => {
+export const useGetFavoriteCats = (onSuccess?: () => void) => {
   return useInfiniteQuery<FavoritesRes>(
     {
+      //@ts-expect-error todo
       queryKey: ["fetchFavorites"],
       queryFn: ({ pageParam }: { pageParam: number }) => {
         return fetchFavorites((pageParam ?? 0).toString());
       },
-      getNextPageParam: (_: FavoritesRes, allPages: FavoritesRes) => {
+      getNextPageParam: (lastPage: FavoritesRes, allPages: FavoritesRes) => {
+        if (lastPage.length === 0) return undefined;
         return allPages ? allPages.length : 0;
       },
-      staleTime: 20000000,
     },
     {
       keepPreviousData: true,

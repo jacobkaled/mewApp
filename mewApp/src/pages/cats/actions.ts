@@ -11,16 +11,16 @@ export const fetchCats = async (params: QueryParams) => {
 };
 
 export const useGetCats = (
-  queryParams: QueryParams,
+  queryParams?: QueryParams,
   onSuccess?: () => void
 ) => {
   return useInfiniteQuery<CatsResp>(
     {
-      queryKey: ["fetch-cats", JSON.stringify(queryParams)],
-      queryFn: ({ pageParam }: { pageParam: number }) => {
+      queryKey: ["GetCats", JSON.stringify({ ...queryParams })],
+      queryFn: (pageParam?: QueryParams) => {
         return fetchCats({
           ...queryParams,
-          limit: "5",
+          limit: "10",
           page: (pageParam ?? 0).toString(),
         });
       },
@@ -31,7 +31,8 @@ export const useGetCats = (
     },
     {
       keepPreviousData: true,
-      onSuccess,
+
+      onSuccess: onSuccess && onSuccess(),
     }
   );
 };
