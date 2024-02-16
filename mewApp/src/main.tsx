@@ -21,7 +21,7 @@ const Layout = () => {
         id="main-layout"
         width="100vw"
         height="calc(100vh - 80px)"
-        overflow="auto"
+        overflow="hidden"
         top="80px"
         position="absolute"
       >

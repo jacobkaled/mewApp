@@ -7,27 +7,34 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import GradeIcon from "@mui/icons-material/Grade";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useState } from "react";
 import BasicModal from "../../../components/basicModal";
-import useGetCats from "../actions";
-import { Waypoint } from "react-waypoint";
 import { useNavigate } from "react-router-dom";
-import { Breed, CatsResp } from "../../../types";
+import { CatsList } from "../../../components/catsList";
+import BreedsList from "./components/BreedsList";
+import { useModal } from "../../../hooks";
 
 const Cat = () => {
   const { catId } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isSuccess } = useGetCat(catId!);
+  const {
+    isOpen,
+    handleCloseModal: closeModal,
+    handleOpenModal: openModal,
+  } = useModal();
   const { mutate, isLoading: isMutating } = useMakeCatFav(catId!, () =>
-    navigate("../cats")
+    navigate("../favorites")
   );
-  const [selectedBreed, setSelectedBreed] = useState("");
+  const [selectedBreed, setSelectedBreed] = useState<string | null>(null);
 
-  const closeBreedModal = () => {
-    setSelectedBreed("");
+  const handleCloseBreedModal = () => {
+    closeModal();
+    setSelectedBreed(null);
   };
   const handleSelectBreed = (breedId: string) => {
+    openModal();
     setSelectedBreed(breedId);
   };
 
@@ -54,132 +61,49 @@ const Cat = () => {
             sx={{
               position: "fixed",
               top: "100px",
-              right: "20px",
-              padding: "30px",
+              left: "20px",
+              padding: "10px",
             }}
           >
-            {data.favourite ? (
-              <Typography>your cat has been added to favorites</Typography>
-            ) : (
-              <Button
-                onClick={() => mutate()}
-                disabled={isMutating}
-                sx={{ display: "flex", gap: "10px", alignItems: "center" }}
-              >
-                <Typography>add this cat to favorite</Typography>
-                <GradeIcon />
-              </Button>
-            )}
-          </Card>
-          {data.breeds && data.breeds.length > 0 ? (
+            <Button
+              onClick={() => mutate()}
+              disabled={isMutating}
+              sx={{ display: "flex", gap: "10px", alignItems: "center" }}
+            >
+              <Typography>add this cat to favorite</Typography>
+              <FavoriteIcon />
+            </Button>
+
             <BreedsList
               breedsList={data.breeds}
               onSelectBreed={handleSelectBreed}
             />
-          ) : (
-            <Card
-              variant="elevation"
-              sx={{
-                marginTop: "10px",
-                padding: "20px",
-                textAlign: "center",
-                border: "1px solid lightGrey",
-              }}
-            >
-              <Typography>NO Breeds available for this cat !!.. </Typography>
-            </Card>
-          )}
+          </Card>
         </>
       )}
-
-      <BasicModal open={!!selectedBreed} onClose={closeBreedModal}>
-        <CatsList breedid={selectedBreed} />
-      </BasicModal>
-    </Grid>
-  );
-};
-
-const CatsList = ({ breedid }: { breedid: string }) => {
-  const { data, isLoading, isFetching, fetchNextPage } = useGetCats({
-    breed_ids: breedid,
-  });
-  const combinedData = data ? (data.pages.flat() as CatsResp) : [];
-
-  //TODO ... reuse the same component from CAT.tsx
-  return (
-    <>
-      {isLoading && <Grid>...loading </Grid>}
-      {data && (
-        <Grid container>
-          {data &&
-            combinedData.map((cat) => (
-              <Grid container display="flex" flexDirection="column">
-                <Grid>{cat.height}</Grid>
-                <Grid>{cat.width}</Grid>
-                <Grid>
-                  <a href={`../cats/${cat.id}`}>{cat.id}</a>
-                </Grid>
-                <img
-                  src={cat.url}
-                  alt="cat image"
-                  width="100%"
-                  style={{ aspectRatio: "1/1" }}
-                />
-              </Grid>
-            ))}
-          <Grid
-            container
-            sx={{
-              width: "100%",
-              height: "100px",
-              marginTop: "100px",
-            }}
-            display="flex"
-            justifyContent="center"
-          >
-            {isFetching && <CircularProgress />}
-            <Waypoint onEnter={() => fetchNextPage()} />
-          </Grid>
-        </Grid>
+      {selectedBreed && (
+        <BasicModal open={isOpen} onClose={handleCloseBreedModal}>
+          <CatsList
+            queries={{ breed_ids: selectedBreed }}
+            imageToolBar={(catData) => (
+              <Button
+                onClick={() => {
+                  handleCloseBreedModal();
+                  navigate(`../cats/${catData.id}`);
+                }}
+                sx={{
+                  width: "100%",
+                  backgroundColor: "lightskyblue",
+                  padding: "5px",
+                }}
+              >
+                Cat Details
+              </Button>
+            )}
+          />
+        </BasicModal>
       )}
-    </>
-  );
-};
-
-const BreedsList = ({
-  breedsList,
-  onSelectBreed,
-}: {
-  breedsList: Array<Breed>;
-  onSelectBreed: (breedId: string) => void;
-}) => {
-  return breedsList && breedsList.length > 0 ? (
-    <Card
-      sx={{ position: "fixed", top: "100px", left: "20px", padding: "30px" }}
-    >
-      <Typography> Available Breeds </Typography>
-      <Button>
-        <Typography>
-          {breedsList.map((breed) => (
-            <Typography onClick={() => onSelectBreed(breed.id)}>
-              {breed.name}
-            </Typography>
-          ))}
-        </Typography>
-      </Button>
-    </Card>
-  ) : (
-    <Card
-      variant="elevation"
-      sx={{
-        marginTop: "10px",
-        padding: "20px",
-        textAlign: "center",
-        border: "1px solid lightGrey",
-      }}
-    >
-      <Typography>NO Breeds available for this cat !!.. </Typography>
-    </Card>
+    </Grid>
   );
 };
 

@@ -27,11 +27,11 @@ export default function BasicModal(props: ModalProps) {
             transform: "translate(-50%, -50%)",
             width: "80%",
             bgcolor: "background.paper",
-            // border: "2px solid #000",
             boxShadow: 24,
             maxHeight: "80%",
-            overflow: "scroll",
-            p: 4,
+            height: "600px",
+            overflow: "hidden",
+            padding: "20px",
           }}
         >
           {children}

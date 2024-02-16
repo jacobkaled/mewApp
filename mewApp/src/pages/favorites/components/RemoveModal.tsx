@@ -22,7 +22,7 @@ export default function RemoveModal(props: RemoveModalProps) {
       <DialogActions>
         <Button onClick={onCloseModal}>close</Button>
         <Button onClick={onDeleteAttribute} autoFocus disabled={isLoading}>
-          {isLoading ? "Loading" : "remove"}
+          {isLoading ? "removing" : "remove"}
         </Button>
       </DialogActions>
     </Dialog>
