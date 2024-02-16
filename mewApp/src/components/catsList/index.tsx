@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { CatData, CatsResp, QueryParams } from "../../types";
 import useGetCats from "../../pages/cats/actions";
 import { useScrollDown } from "../../hooks";
@@ -16,7 +16,15 @@ export const CatsList = ({
     useGetCats(queries);
   useScrollDown(ref, isFetching);
 
-  console.log("data =>", data);
+  const catsData = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+    return (data.pages as Array<CatsResp>).reduce(
+      (acc, page) => acc.concat(page),
+      []
+    );
+  }, [data]);
 
   return (
     <>
@@ -37,43 +45,41 @@ export const CatsList = ({
           width="100%"
           height="100%"
         >
-          {data.pages.map((page) =>
-            (page as CatsResp).map((cat) => (
-              <Card
-                sx={{
-                  display: "flex",
-                  position: "relative",
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
-                  alignContent: "flex-start",
-                  width: "auto",
-                  height: "auto",
-                }}
-                key={`Cat-${cat.id}-photo`}
-              >
+          {catsData.map((cat) => (
+            <Card
+              sx={{
+                display: "flex",
+                position: "relative",
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                alignContent: "flex-start",
+                width: "auto",
+                height: "auto",
+              }}
+              key={`Cat-${cat.id}-photo`}
+            >
+              <Grid
+                position="absolute"
+                top={0}
+                left={0}
+                padding="10px"
+                gap="5px"
+              ></Grid>
+              <Grid container display="flex" flexDirection="column">
                 <Grid
-                  position="absolute"
-                  top={0}
-                  left={0}
-                  padding="10px"
-                  gap="5px"
-                ></Grid>
-                <Grid container display="flex" flexDirection="column">
-                  <Grid
-                    sx={{
-                      aspectRatio: "1/1",
-                      height: "300px",
-                      overflow: "hidden",
-                      padding: 0,
-                    }}
-                  >
-                    <img src={cat.url} alt={cat.id} />
-                  </Grid>
-                  <>{imageToolBar(cat)}</>
+                  sx={{
+                    aspectRatio: "1/1",
+                    height: "300px",
+                    overflow: "hidden",
+                    padding: 0,
+                  }}
+                >
+                  <img src={cat.url} alt={cat.id} />
                 </Grid>
-              </Card>
-            ))
-          )}
+                <>{imageToolBar(cat)}</>
+              </Grid>
+            </Card>
+          ))}
           <Grid
             container
             sx={{

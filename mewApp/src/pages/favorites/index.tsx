@@ -1,6 +1,6 @@
 import { Button, Card, CircularProgress, Grid } from "@mui/material";
 import { useRemoveFromFavs, useGetFavoriteCats } from "./actions";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import RemoveModal from "./components/RemoveModal";
 import { FavoritesRes } from "../../types";
 import { HeartBroken } from "@mui/icons-material";
@@ -14,44 +14,51 @@ const Favorites = () => {
   const { mutate, isLoading: isRemoving } = useRemoveFromFavs(() =>
     setSelectedFavCat(null)
   );
-  useScrollDown(ref, isFetching);
-  const combinedData = data ? (data.pages.flat() as FavoritesRes) : [];
 
-  console.log("combinedData", combinedData);
+  const catsData = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+    return (data.pages as Array<FavoritesRes>).reduce(
+      (acc, page) => acc.concat(page),
+      []
+    );
+  }, [data]);
+
+  useScrollDown(ref, isFetching);
 
   return (
     <>
-      {isLoading && (
+      {isLoading || isFetching ? (
         <Grid>
           <CircularProgress />
         </Grid>
-      )}
-      {data && (
-        <Grid
-          container
-          display="flex"
-          flexWrap="wrap"
-          justifyContent="flex-start"
-          gap="20px"
-          overflow="scroll"
-          width="100%"
-          ref={ref}
-          height="100%"
-        >
-          {combinedData.length === 0 ? (
-            <Grid
-              width="100%"
-              height="100%"
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-            >
-              no Favorites Available
-            </Grid>
-          ) : (
-            <>
-              {data.pages.map((page) =>
-                (page as FavoritesRes).map((cat) => (
+      ) : (
+        data && (
+          <Grid
+            container
+            display="flex"
+            flexWrap="wrap"
+            justifyContent="flex-start"
+            gap="20px"
+            overflow="scroll"
+            width="100%"
+            ref={ref}
+            height="100%"
+          >
+            {catsData.length === 0 ? (
+              <Grid
+                width="100%"
+                height="100%"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                no Favorites Available
+              </Grid>
+            ) : (
+              <>
+                {catsData.map((cat) => (
                   <Card
                     sx={{
                       display: "flex",
@@ -86,39 +93,38 @@ const Favorites = () => {
                         />
                       </Grid>
 
-                      {/* abstraction herre */}
                       <Button onClick={() => setSelectedFavCat(cat.id)}>
                         remove from favourite <HeartBroken />
                       </Button>
                     </Grid>
                   </Card>
-                ))
-              )}
-              <Grid
-                container
-                sx={{
-                  width: "100%",
-                  paddingY: "20px",
-                }}
-                display="flex"
-                justifyContent="center"
-              >
-                {isFetching ? (
-                  <CircularProgress />
-                ) : (
-                  hasNextPage && (
-                    <Button
-                      onClick={() => fetchNextPage()}
-                      disabled={isFetching}
-                    >
-                      Get more Cats
-                    </Button>
-                  )
-                )}
-              </Grid>
-            </>
-          )}
-        </Grid>
+                ))}
+                <Grid
+                  container
+                  sx={{
+                    width: "100%",
+                    paddingY: "20px",
+                  }}
+                  display="flex"
+                  justifyContent="center"
+                >
+                  {isFetching ? (
+                    <CircularProgress />
+                  ) : (
+                    hasNextPage && (
+                      <Button
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetching}
+                      >
+                        Get more Cats
+                      </Button>
+                    )
+                  )}
+                </Grid>
+              </>
+            )}
+          </Grid>
+        )
       )}
 
       {selectedFavCat && (

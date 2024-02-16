@@ -59,12 +59,10 @@ export const fetchFavorites = async (pagenum: string) => {
   return res.json();
 };
 
-// ----- add cat to favourite ------ //
-
 export const useGetFavoriteCats = () => {
   const { setToastInfo } = useToastMessage();
   return useInfiniteQuery<FavoritesRes>({
-    //@ts-expect-error todo
+    //@ts-expect-error TODO .. fix below type error :https://github.com/TanStack/query/discussions/5800
     queryKey: ["fetchFavorites"],
     queryFn: ({ pageParam }: { pageParam: number }) => {
       return fetchFavorites((pageParam ?? 0).toString());
@@ -82,6 +80,8 @@ export const useGetFavoriteCats = () => {
       }),
   });
 };
+
+// ----- add cat to favourite ------ //
 
 const makeCatFav = async (imageId: string) => {
   const requestOptions: RequestInit = {

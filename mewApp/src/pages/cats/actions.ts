@@ -20,7 +20,7 @@ export const useGetCats = (
 ) => {
   const { setToastInfo } = useToastMessage();
   return useInfiniteQuery<CatsResp>({
-    //@ts-expect-error todo
+    //@ts-expect-error TODO .. fix below type error :https://github.com/TanStack/query/discussions/5800
     queryKey: ["GetCats", JSON.stringify({ ...queryParams })],
     queryFn: ({ pageParam }: { pageParam: number }) => {
       return fetchCats({
@@ -32,7 +32,7 @@ export const useGetCats = (
     getNextPageParam: (_: CatsResp, allPages: CatsResp) => {
       return allPages ? allPages.length : 0;
     },
-    staleTime: 20000000,
+    staleTime: 20000000, // to have stable data since cats are random
     keepPreviousData: true,
     onError: (error) =>
       setToastInfo({

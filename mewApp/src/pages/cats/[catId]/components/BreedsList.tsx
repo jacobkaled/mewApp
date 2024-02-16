@@ -1,13 +1,13 @@
 import { Button, Card, Typography } from "@mui/material";
 import { Breed } from "../../../../types";
 
-const BreedsList = ({
-  breedsList,
-  onSelectBreed,
-}: {
+type BreedsListProps = {
   breedsList: Array<Breed>;
   onSelectBreed: (breedId: string) => void;
-}) => {
+};
+
+const BreedsList = (props: BreedsListProps) => {
+  const { breedsList, onSelectBreed } = props;
   return (
     <Card
       sx={{
@@ -25,8 +25,8 @@ const BreedsList = ({
             Available Breeds
           </Typography>
 
-          {breedsList.map((breed) => (
-            <Button>
+          {breedsList.map((breed, index) => (
+            <Button key={`${breed}${index}`}>
               <Typography onClick={() => onSelectBreed(breed.id)}>
                 {breed.name}
               </Typography>
