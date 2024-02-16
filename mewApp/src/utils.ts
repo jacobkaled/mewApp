@@ -1,10 +1,10 @@
-import { API_KEY, QueryParams } from "./types";
+import { QueryParams } from "./types";
 
 export const CATS_URL = "https://api.thecatapi.com/v1";
 
 export const headers = new Headers({
   "Content-Type": "application/json",
-  "x-api-key": API_KEY,
+  "x-api-key": import.meta.env.VITE_API_KEY,
 });
 
 export const requestOptions: RequestInit = {
